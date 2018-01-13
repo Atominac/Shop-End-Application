@@ -1,0 +1,52 @@
+package com.shop.atominac.shopend;
+
+
+public class OrderModel {
+
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public String getPayment() {
+        return payment;
+    }
+
+    public String getList() {
+        return list;
+    }
+    public String getTime() {
+        return time;
+    }
+
+
+    private String address;
+    private String amount;
+    private String payment;
+    private String list ;
+    private String name;
+    private String time;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public OrderModel(String name, String address, String amount, String payment, String list, String time,String status) {
+        this.name = name;
+        this.address = address;
+        this.amount = amount;
+        this.payment = payment;
+        this.list = list;
+        this.time=time;
+        this.status=status;
+    }
+}
