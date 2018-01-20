@@ -11,6 +11,14 @@
 
             android:title="Update" />
         <item
+            android:id="@+id/auto_buy"
+
+            android:title="Auto Buy" />
+        <item
+            android:id="@+id/nav_myboys"
+
+            android:title="Delivery Boys" />
+        <item
             android:id="@+id/nav_offers"
 
             android:title="Offers" />

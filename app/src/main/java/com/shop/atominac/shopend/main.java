@@ -77,7 +77,21 @@ public class main extends AppCompatActivity
             fragmentTransaction.replace(R.id.fragment_container,fragment);
             fragmentTransaction.commit();
 
-        } else if (id == R.id.nav_offers) {
+        } else if (id == R.id.auto_buy) {
+            Auto_buy fragment = new Auto_buy();
+            FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container,fragment);
+            fragmentTransaction.commit();
+
+        }else if (id == R.id.nav_myboys) {
+            Delivery_Boy fragment = new Delivery_Boy();
+            FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container,fragment);
+            fragmentTransaction.commit();
+
+        }
+
+        else if (id == R.id.nav_offers) {
             offers fragment = new offers();
             FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container,fragment);

@@ -14,7 +14,7 @@ class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder>{
     private List<OrderModel> activityList;
     private Context mContext;
 
-    OrderAdapter(List<UpdateModel> activityList, Context context) {
+    OrderAdapter(List<OrderModel> activityList, Context context) {
         this.activityList = activityList;
         mContext = context;
     }
