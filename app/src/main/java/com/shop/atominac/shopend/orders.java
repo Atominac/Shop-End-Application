@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -67,7 +68,7 @@ public class orders extends Fragment {
     void MyOrderListApiCall(){
         showProgress();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String api = "http://192.168.1.5:8000/viewPendingOrders";
+        String api = "https://homebuddy2018.herokuapp.com/viewPendingOrders";
 
         VolleyRequester request = new VolleyRequester(Request.Method.GET,api,null,new Response.Listener<JSONArray>() {
             @Override
@@ -75,27 +76,34 @@ public class orders extends Fragment {
 
                 for (int i = 0; i <=jsonArray.length(); i++) {
                     try {
-                        JSONObject itemDetails = (JSONObject)jsonArray.get(i);
-                        String coustmer_name = itemDetails.get("customer_name").toString();
-                        String coustmer_address = itemDetails.get("customer_address").toString();
-                        String itemList = itemDetails.get("item_list").toString();
-                        String bill = itemDetails.get("amount").toString();
-                        String status = itemDetails.get("status").toString();
-                        String payment = itemDetails.get("delivery_type").toString();
-                        String time = itemDetails.get("order_time").toString();
+
+                        if (!jsonArray.toString().equals("[]")){
+                            JSONObject itemDetails = (JSONObject)jsonArray.get(i);
+                            String order_id =itemDetails.get("id").toString();
+                            String coustmer_name = itemDetails.get("customer_name").toString();
+                            String coustmer_address = itemDetails.get("customer_address").toString();
+                            String itemList = itemDetails.get("item_list").toString();
+                            String bill = itemDetails.get("amount").toString();
+                            String status = itemDetails.get("status").toString();
+                            String payment = itemDetails.get("delivery_type").toString();
+                            String time = itemDetails.get("order_time").toString();
 
 
-                        String str[]=time.split("T");
-                        String date=str[0];
-                        String rawtime=str[1];
-                        String strtime[]=rawtime.split(":");
-                        String hours=strtime[0];
-                        String minute=strtime[1];
-                        String finaltime=hours + ":" + minute;
-                        String finaldatetime=date + " " + finaltime;
+                            String str[]=time.split("T");
+                            String date=str[0];
+                            String rawtime=str[1];
+                            String strtime[]=rawtime.split(":");
+                            String hours=strtime[0];
+                            String minute=strtime[1];
+                            String finaltime=hours + ":" + minute;
+                            String finaldatetime=date + " " + finaltime;
 
-                        activityItems = new OrderModel(coustmer_name , coustmer_address, "Bill amount : Rs " + bill ,payment,itemList,finaldatetime,status);
-                        activityList.add(activityItems);
+                            activityItems = new OrderModel(coustmer_name , coustmer_address, "Bill amount : Rs " + bill ,payment,itemList,finaldatetime,status,order_id);
+                            activityList.add(activityItems);
+                        }
+                        else
+                            Toast.makeText(getActivity(),"No orders !!!!!!",Toast.LENGTH_LONG).show();
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();

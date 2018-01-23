@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -78,13 +79,27 @@ public class main extends AppCompatActivity
             fragmentTransaction.commit();
 
         } else if (id == R.id.auto_buy) {
-            Auto_buy fragment = new Auto_buy();
-            FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container,fragment);
-            fragmentTransaction.commit();
+//            Auto_buy fragment = new Auto_buy();
+//            FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
+//            fragmentTransaction.replace(R.id.fragment_container,fragment);
+//            fragmentTransaction.commit();
+                Toast.makeText(main.this,"Not Available",Toast.LENGTH_SHORT).show();
+
 
         }else if (id == R.id.nav_myboys) {
-            Delivery_Boy fragment = new Delivery_Boy();
+            BoyList fragment = new BoyList();
+            Bundle bundle=new Bundle();
+            bundle.putString("id","1");
+            fragment.setArguments(bundle);
+            (main.this).getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container,fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        }
+
+        else if (id == R.id.nav_allorders) {
+            offers fragment = new offers();
             FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container,fragment);
             fragmentTransaction.commit();
@@ -108,5 +123,10 @@ public class main extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 }

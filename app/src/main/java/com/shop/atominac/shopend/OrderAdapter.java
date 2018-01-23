@@ -2,10 +2,12 @@ package com.shop.atominac.shopend;
 
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder>{
     private List<OrderModel> activityList;
     private Context mContext;
+    OrderModel activityListItems;
 
     OrderAdapter(List<OrderModel> activityList, Context context) {
         this.activityList = activityList;
@@ -21,6 +24,7 @@ class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder>{
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView list , name , address , payment,amount,time ,status;
+        Button button;
 
         ViewHolder(View view) {
             super(view);
@@ -31,7 +35,7 @@ class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder>{
             amount = (TextView) view.findViewById(R.id.amount);
             payment = (TextView) view.findViewById(R.id.payment);
             time = (TextView) view.findViewById(R.id.time);
-
+            button=(Button) view.findViewById((R.id.statusbutton));
             status = (TextView) view.findViewById(R.id.status);        }
     }
 
@@ -43,7 +47,7 @@ class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(OrderAdapter.ViewHolder holder, int position) {
-        OrderModel activityListItems = activityList.get(position);
+        activityListItems = activityList.get(position);
         holder.amount.setText(activityListItems.getAmount());
         holder.list.setText(activityListItems.getList());
         holder.name.setText(activityListItems.getName());
@@ -51,6 +55,20 @@ class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder>{
         holder.payment.setText(activityListItems.getPayment());
         holder.time.setText(activityListItems.getTime());
         holder.status.setText(activityListItems.getStatus());
+        holder.button.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+//                    Toast.makeText(mContext,categoryName.getText().toString(),Toast.LENGTH_SHORT).show();
+                Delivery_Boy fragment = new Delivery_Boy();
+                Bundle bundle=new Bundle();
+                bundle.putString("id",activityListItems.getId());
+                fragment.setArguments(bundle);
+                ((main) mContext).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container,fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
     }
 
     @Override

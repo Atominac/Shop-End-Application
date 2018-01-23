@@ -1,15 +1,17 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.shop.atominac.shopend.update"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:orientation="vertical">
+
     <EditText
+        android:id="@+id/search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/search"
-        android:hint="Search Here"/>
+        android:hint="Search Here" />
+
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/update_recycler"
@@ -17,7 +19,8 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:clipToPadding="false"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:layout_marginTop="40dp">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -28,7 +31,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="200dp"
         android:indeterminate="true"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <ProgressBar
+        android:id="@+id/MoreItem_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="13dp" />
 
 
-</LinearLayout>
+</RelativeLayout>

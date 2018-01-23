@@ -14,11 +14,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -46,7 +49,7 @@ import java.util.Objects;
 
 public class update extends Fragment {
     protected View mView;
-    ProgressBar progressBar;
+    ProgressBar progressBar,loadMoreProgressBar;
     private List<UpdateModel> activityList = new ArrayList<>();
     private UpdateAdapter mAdapter;
     UpdateModel activityItems;
@@ -54,8 +57,8 @@ public class update extends Fragment {
     RecyclerView recyclerView ;
     private ProgressDialog pDialog;
     private static final String TAG = "PlaceOrder";
-    TextView textView;
-    Button button;
+    EditText search ;
+    int page_count = 1 ;
 
     String user_id;
 
@@ -73,9 +76,8 @@ public class update extends Fragment {
         this.mView = view;
         setHasOptionsMenu(true);
 
-
-
-        progressBar = (ProgressBar)mView.findViewById(R.id.update_progress);
+        progressBar = (ProgressBar)mView.findViewById(R.id.update_progressBar);
+        loadMoreProgressBar = (ProgressBar)mView.findViewById(R.id.MoreItem_loading);
         recyclerView = (RecyclerView) mView.findViewById(R.id.update_recycler);
         mAdapter = new UpdateAdapter(activityList, getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
@@ -83,42 +85,62 @@ public class update extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        MyOrderListApiCall();
+        search = (EditText)mView.findViewById(R.id.search);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                activityList.clear();
+                mAdapter= new UpdateAdapter(activityList,getActivity());
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                SearchItemListApiCall(s.toString());
+                page_count = 1 ;
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    LoadMoreItemListApiCall(search.getText().toString(),++page_count);
+                }
+            }
+        });
+
 
         return view;
     }
 
-    void MyOrderListApiCall(){
+    void SearchItemListApiCall(final String text){
         showProgress();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String api = "http://192.168.1.5:8000/viewPendingOrders";
+        String api = "https://homebuddy2018.herokuapp.com/search/";
+        Map<String, Object> data = new HashMap<>();
+        data.put( "text", text );
+        data.put( "page_no", 1 );
 
-        VolleyRequester request = new VolleyRequester(Request.Method.GET,api,null,new Response.Listener<JSONArray>() {
+        VolleyRequester request = new VolleyRequester(Request.Method.POST,api,new JSONObject(data),new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
 
                 for (int i = 0; i <=jsonArray.length(); i++) {
                     try {
                         JSONObject itemDetails = (JSONObject)jsonArray.get(i);
-                        String coustmer_name = itemDetails.get("customer_name").toString();
-                        String coustmer_address = itemDetails.get("customer_address").toString();
-                        String itemList = itemDetails.get("item_list").toString();
-                        String bill = itemDetails.get("amount").toString();
-                        String status = itemDetails.get("status").toString();
-                        String payment = itemDetails.get("delivery_type").toString();
-                        String time = itemDetails.get("order_time").toString();
 
-
-                        String str[]=time.split("T");
-                        String date=str[0];
-                        String rawtime=str[1];
-                        String strtime[]=rawtime.split(":");
-                        String hours=strtime[0];
-                        String minute=strtime[1];
-                        String finaltime=hours + ":" + minute;
-                        String finaldatetime=date + " " + finaltime;
-
-                       // activityItems = new OrderModel(coustmer_name , coustmer_address, "Bill amount : Rs " + bill ,payment,itemList,finaldatetime,status);
+                        String itemName = itemDetails.get("name").toString();
+                        String itemPrice = itemDetails.get("price").toString();
+                        String itemBrand = itemDetails.get("brand").toString();
+                        activityItems = new UpdateModel(itemName , "Rs. "+itemPrice , "Brand : "+itemBrand );
                         activityList.add(activityItems);
 
                     } catch (JSONException e) {
@@ -148,35 +170,44 @@ public class update extends Fragment {
         queue.add(request);
     }
 
-    private void PlaceOrderApiCall(String id , String paymentType){
-        showProgressDialog();
+    void LoadMoreItemListApiCall(final String text , int page_no){
+        showLoadMoreProgress();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String api = "https://homebuddy2018.herokuapp.com/placeOrder/";
+        String api = "https://homebuddy2018.herokuapp.com/search/";
         Map<String, Object> data = new HashMap<>();
-        data.put( "id", id );
-        data.put( "payment_type", paymentType );
+        data.put( "text", text );
+        data.put( "page_no", page_no );
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,api,new JSONObject(data),new Response.Listener<JSONObject>() {
+        VolleyRequester request = new VolleyRequester(Request.Method.POST,api,new JSONObject(data),new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONArray jsonArray) {
 
-                try {
-                    String status = response.getString("status");
-                    if (status.equals("success")) {
-                        String bill = response.getString("bill");
-                        Intent intent = new Intent("com.homebuddy.homebuddy.OrderSuccess");
-                        intent.putExtra("bill",bill);
-                        startActivity(intent);
+                for (int i = 0; i <=jsonArray.length(); i++) {
+                    try {
+                        JSONObject itemDetails = (JSONObject)jsonArray.get(i);
+
+                        if (!itemDetails.has("status")){
+                            String itemName = itemDetails.get("name").toString();
+                            String itemPrice = itemDetails.get("price").toString();
+                            String itemBrand = itemDetails.get("brand").toString();
+                            activityItems = new UpdateModel(itemName , "Rs. "+itemPrice , "Brand : "+itemBrand);
+                            activityList.add(activityItems);
+                        }
+
+                        else{
+//                            Toast.makeText(getActivity(),"No more data",Toast.LENGTH_LONG).show();
+                            break;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+
                 }
 
-                catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getActivity(),"Error: " + e.getMessage(),Toast.LENGTH_LONG).show();
-                }
-                hideProgressDialog();
+                mAdapter.notifyDataSetChanged();
+                hideLoadMoreProgress();
             }
-
         }, new Response.ErrorListener() {
 
             @Override
@@ -195,6 +226,8 @@ public class update extends Fragment {
         queue.add(request);
     }
 
+
+
     private void showProgress() {
         recyclerView.setVisibility(View.GONE);
         progressBar.setIndeterminate(true);
@@ -207,15 +240,14 @@ public class update extends Fragment {
         progressBar.setVisibility(View.GONE);
     }
 
-    private void showProgressDialog() {
-        if (!pDialog.isShowing())
-            pDialog.show();
-    }
+    private void showLoadMoreProgress() {
 
-    private void hideProgressDialog() {
-        if (pDialog.isShowing())
-            pDialog.dismiss();
+        loadMoreProgressBar.setIndeterminate(true);
+        loadMoreProgressBar.setVisibility(View.VISIBLE);
     }
-
+    private void hideLoadMoreProgress() {
+        loadMoreProgressBar.setIndeterminate(false);
+        loadMoreProgressBar.setVisibility(View.GONE);
+    }
 
 }

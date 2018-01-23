@@ -1,7 +1,7 @@
 package com.shop.atominac.shopend;
 
-
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,69 +23,85 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Fragment_update extends Fragment {
-
+public class MyOrders extends Fragment {
     protected View mView;
-    private static final String TAG = "update";
+    private static final String TAG = "myOrders";
     RecyclerView recyclerView ;
-    private List<UpdateModel> activityList = new ArrayList<>();
-    private UpdateAdapter mAdapter;
-    UpdateModel activityItems;
+    private List<MyOrderModel> activityList = new ArrayList<>();
+    private MyOrderAdapter mAdapter;
+    MyOrderModel activityItems;
     ProgressBar progressBar;
     LinearLayoutManager layoutManager ;
 
+    String user_id;
 
-    public Fragment_update() {
+    public MyOrders() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_orders, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_my_orders, container, false);
         this.mView = view;
 
-        progressBar = (ProgressBar)mView.findViewById(R.id.order_progressBar);
-        recyclerView = (RecyclerView) mView.findViewById(R.id.order_recycler);
-        mAdapter = new UpdateAdapter(activityList, getActivity());
+        ((main) getActivity())
+                .setActionBarTitle("All Orders");
+
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setVisibility(View.INVISIBLE);
+
+        progressBar = (ProgressBar)mView.findViewById(R.id.my_order_progress_bar);
+        recyclerView = (RecyclerView) mView.findViewById(R.id.my_order_recycler);
+        mAdapter = new MyOrderAdapter(activityList, getActivity());
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        MyOrderListApiCall();
 
-        return  view ;
+
+        MyOrderListApiCall(user_id);
+
+        return view ;
     }
 
-    void MyOrderListApiCall(){
+    void MyOrderListApiCall(String id){
         showProgress();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String api = "http://192.168.1.5:8000/viewPendingOrders";
+        String api = "https://homebuddy2018.herokuapp.com/allDeliveredOrders/";
+        Map<String, Object> data = new HashMap<>();
+        data.put( "id", id );
 
-        VolleyRequester request = new VolleyRequester(Request.Method.GET,api,null,new Response.Listener<JSONArray>() {
+        VolleyRequester request = new VolleyRequester(Request.Method.POST,api,new JSONObject(data),new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
 
-                for (int i = 0; i <=jsonArray.length(); i++) {
+                for (int i = jsonArray.length(); i >=0; i--) {
                     try {
                         JSONObject itemDetails = (JSONObject)jsonArray.get(i);
-                        String coustmer_name = itemDetails.get("customer_name").toString();
-                        String coustmer_address = itemDetails.get("customer_address").toString();
                         String itemList = itemDetails.get("item_list").toString();
                         String bill = itemDetails.get("amount").toString();
                         String status = itemDetails.get("status").toString();
                         String payment = itemDetails.get("delivery_type").toString();
-                        String time = itemDetails.get("order_time").toString();
+                        String date_time = itemDetails.get("order_time").toString();
+                        String str[] = date_time.split("T");
+                        String date  = str[0];
+                        String rawTime = str[1];
+                        String strTime[] = rawTime.split(":");
+                        String hours = strTime[0];
+                        String minutes = strTime[1];
+                        String time = hours + ":" + minutes ;
 
+                        String finalDateTime = date + " " + time ;
 
-
-
-                        activityItems = new UpdateModel(coustmer_name , coustmer_address, "Bill amount : Rs " + bill ,payment,itemList,status);
+                        activityItems = new MyOrderModel(itemList , "Bill amount : Rs " + bill ,"Status : " +  status ,"Payment type : " + payment , finalDateTime);
                         activityList.add(activityItems);
 
                     } catch (JSONException e) {
@@ -94,7 +110,10 @@ public class Fragment_update extends Fragment {
 
                 }
 
-                mAdapter.notifyDataSetChanged();
+                mAdapter = new MyOrderAdapter(activityList, getActivity());
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setItemAnimator(new DefaultItemAnimator());
+                recyclerView.setAdapter(mAdapter);
                 hideProgress();
             }
         }, new Response.ErrorListener() {
@@ -126,9 +145,6 @@ public class Fragment_update extends Fragment {
         progressBar.setIndeterminate(false);
         progressBar.setVisibility(View.GONE);
     }
-
-
-
 
 
 }
