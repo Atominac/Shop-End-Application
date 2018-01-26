@@ -2,6 +2,7 @@ package com.shop.atominac.shopend;
 
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -60,6 +61,16 @@ public class orders extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activityList.clear();
+                mAdapter.notifyDataSetChanged();
+                MyOrderListApiCall();
+            }
+        });
+        fab.setVisibility(View.VISIBLE);
         MyOrderListApiCall();
 
         return  view ;

@@ -75,11 +75,9 @@ public class MyOrders extends Fragment {
     void MyOrderListApiCall(String id){
         showProgress();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String api = "https://homebuddy2018.herokuapp.com/allDeliveredOrders/";
-        Map<String, Object> data = new HashMap<>();
-        data.put( "id", id );
+        String api = "https://homebuddy2018.herokuapp.com/viewDeliveredOrders/";
 
-        VolleyRequester request = new VolleyRequester(Request.Method.POST,api,new JSONObject(data),new Response.Listener<JSONArray>() {
+        VolleyRequester request = new VolleyRequester(Request.Method.GET,api,null,new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
 

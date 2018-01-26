@@ -25,7 +25,7 @@
         <item
             android:id="@+id/nav_allorders"
 
-            android:title="All Orders" />
+            android:title="All  Orders" />
         <item
             android:id="@+id/nav_revenue"
 

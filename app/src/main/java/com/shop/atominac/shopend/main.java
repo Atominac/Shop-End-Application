@@ -99,7 +99,7 @@ public class main extends AppCompatActivity
         }
 
         else if (id == R.id.nav_allorders) {
-            offers fragment = new offers();
+            MyOrders fragment = new MyOrders();
             FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container,fragment);
             fragmentTransaction.commit();
