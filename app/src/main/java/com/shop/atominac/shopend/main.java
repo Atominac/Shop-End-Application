@@ -106,6 +106,14 @@ public class main extends AppCompatActivity
 
         }
 
+        else if (id == R.id.nav_order_process) {
+            ProcessOrders fragment = new ProcessOrders();
+            FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container,fragment);
+            fragmentTransaction.commit();
+
+        }
+
         else if (id == R.id.nav_offers) {
             offers fragment = new offers();
             FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();

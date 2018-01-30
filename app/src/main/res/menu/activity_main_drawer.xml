@@ -23,6 +23,10 @@
 
             android:title="Offers" />
         <item
+            android:id="@+id/nav_order_process"
+
+            android:title="Dispached Orders" />
+        <item
             android:id="@+id/nav_allorders"
 
             android:title="All  Orders" />
